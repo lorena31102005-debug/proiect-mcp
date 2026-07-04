@@ -1,3 +1,4 @@
+
 import streamlit as st
 import serial
 import serial.tools.list_ports
@@ -7,8 +8,9 @@ import time
 # Configurare panou MCP pe tot ecranul
 st.set_page_config(page_title="Sistem MCP - Interfață Robotică", layout="wide")
 
-st.title("🤖 Monitorizare Centru de Comandă MCP")
-st.subheader("Sistem Robotic Demonstrativ pentru Scanare Multidirecțională și Rutare Autonomă")
+# --- TITLURI DEFINITIVE ȘI PERSONALIZATE CONFORM SOLICITĂRII TALE ---
+st.title("🤖 Integrare MCP cu Sisteme Robotice")
+st.subheader("Platformă Demonstrativă pentru Monitorizare în Timp Real, Calcularea Rutei și Asistență AI")
 
 # Inițializare memorie Streamlit (Session State)
 if "fata" not in st.session_state:
@@ -114,27 +116,27 @@ if intrebare_user:
     # --- VERIFICARE SEMANTICĂ FLEXIBILĂ ---
     if any(cuv in q for cuv in sinonime_hardware):
         if este_conectat:
-            raspuns_ai = f"Sistemul hardware ESP32 este complet mapat și detectat online [INDEX]. Legătura serială este securizată activ pe portul {port_activ} la viteza de transmisie de 115200 baud."
+            raspuns_ai = f"Sistemul hardware ESP32 este complet mapat și detectat online. Legătura serială este securizată activ pe portul {port_activ} la viteza de transmisie de 115200 baud."
         else:
-            raspuns_ai = "În acest moment, modulul hardware nu este detectat fizic pe portul USB [INDEX]. Interfața Streamlit rulează în regim de simulare academică stabilă."
+            raspuns_ai = "În acest moment, modulul hardware nu este detectat fizic pe portul USB. Interfața Streamlit rulează în regim de simulare academică stabilă."
 
     elif any(cuv in q for cuv in sinonime_distante):
-        raspuns_ai = f"Sistemul execută scanarea liniară a mediului prin deplasarea unghiulară a senzorului ultrasonic [INDEX]. Telemetria curentă indică: Sectorul Central (Față): {st.session_state.fata} cm, Flancul Stâng: {st.session_state.stanga} cm, iar Flancul Drept: {st.session_state.dreapta} cm."
+        raspuns_ai = f"Sistemul execută scanarea liniară a mediului prin deplasarea unghiulară a senzorului ultrasonic. Telemetria curentă indică: Sectorul Central (Față): {st.session_state.fata} cm, Flancul Stâng: {st.session_state.stanga} cm, iar Flancul Drept: {st.session_state.dreapta} cm."
 
     elif any(cuv in q for cuv in sinonime_stare):
         if st.session_state.fata < 15 or st.session_state.stanga < 15 or st.session_state.dreapta < 15:
-            raspuns_ai = f"Stare de Urgență: A fost detectat un obstacol în perimetrul critic de siguranță sub 15 cm (Față curentă: {st.session_state.fata} cm) [INDEX]. Actuatoarele periferice (buzzerul și LED-ul) sunt declanșate automat."
+            raspuns_ai = f"Stare de Urgență: A fost detectat un obstacol în perimetrul critic de siguranță sub 15 cm (Față curentă: {st.session_state.fata} cm). Actuatoarele periferice (buzzerul și LED-ul) sunt declanșate automat."
         else:
-            raspuns_ai = f"Stare Nominală: Sistemul rulează în parametri optimi de siguranță [INDEX]. Distanța frontală este curată ({st.session_state.fata} cm), iar indicatorul optic LED verde confirmă absența pericolelor."
+            raspuns_ai = f"Stare Nominală: Sistemul rulează în parametri optimi di siguranță. Distanța frontală este curată ({st.session_state.fata} cm), iar indicatorul optic LED verde confirmă absența pericolelor."
 
     elif any(cuv in q for cuv in sinonime_ruta):
-        raspuns_ai = f"Calculul rutei optime în timp real este asigurat de algoritmul ierarhic MCP, procesat la fiecare împrospătare a ecranului [INDEX]. Analiza curentă a selectat: {st.session_state.ruta}."
+        raspuns_ai = f"Calculul rutei optime în timp real este asigurat de algoritmul ierarhic MCP, procesat la fiecare împrospătare a ecranului. Analiza curentă a selectat: {st.session_state.ruta}."
 
     elif any(cuv in q for cuv in ["salut", "buna", "bună", "ce faci", "cine esti", "cine ești", "hello"]):
-        raspuns_ai = "Salut! Sunt Agentul AI integrat în arhitectura software a Centrului de Comandă MCP [INDEX]. Sunt programat să îți ofer rapoarte telemetrice live, stări de alertă sau decizii vectoriale de navigare [INDEX]."
+        raspuns_ai = "Salut! Sunt Agentul AI integrat în arhitectura software a Centrului de Comandă MCP. Sunt programat să îți ofer rapoarte telemetrice live, stări de alertă sau decizii vectoriale de navigare."
 
     else:
-        raspuns_ai = "Solicitare generală procesată [INDEX]. Pentru a vă oferi un răspuns exact din baza de date a robotului, vă rog să mă întrebați despre: scanarea mediului, calcularea rutei în timp real, starea alertelor sau conexiunea hardware [INDEX]."
+        raspuns_ai = "Solicitare generală procesată. Pentru a vă oferi un răspuns exact din baza de date a robotului, vă rog să mă întrebați despre: scanarea mediului, calcularea rutei în timp real, starea alertelor sau conexiunea hardware."
 
     st.session_state.mesaje_chat.append({"rol": "assistant", "text": raspuns_ai})
     with st.chat_message("assistant"):
@@ -142,4 +144,3 @@ if intrebare_user:
 
 time.sleep(0.04)
 st.rerun()
-
