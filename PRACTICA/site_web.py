@@ -1,3 +1,4 @@
+from streamlit_autorefresh import st_autorefresh
 import streamlit as st
 import serial
 import serial.tools.list_ports
@@ -156,4 +157,6 @@ if intrebare_user:
     with st.chat_message("assistant"): st.write(raspuns_ai)
 
 time.sleep(0.05)
+st_autorefresh(interval=1000, key="datarefresh")
 st.rerun()
+
