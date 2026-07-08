@@ -1,4 +1,21 @@
+import streamlit as st
+import requests
+import time
 
+# Configurare interfață academică și tehnică (Ajustată pentru senzor unic rotativ)
+st.set_page_config(page_title="Monitorizare Date Robot", layout="wide")
+
+st.title("📊 Interfață grafică pentru monitorizarea distanțelor în timp real")
+st.subheader("Afișarea măsurătorilor senzoriale și determinarea opțiunilor de mișcare pentru robotul mobil")
+
+FIREBASE_URL = "https://proiect-mcp-default-rtdb.firebaseio.com/robot.json"
+
+if "mesaje_chat" not in st.session_state: 
+    st.session_state.mesaje_chat = []
+
+def preia_date_cloud():
+    try:
+        raspuns = requests.get(FIREBASE_URL, timeout=0.3)
         if raspuns.status_code == 200:
             return raspuns.json()
     except:
@@ -46,7 +63,7 @@ with col2:
 
 st.divider()
 
-# --- ASISTENT INTELIGENT DEBLOCAT ---
+# --- ASISTENT INTELEGENT GEMINI (DEBLOCAT ȘI ACTIV) ---
 st.header("💬 Asistent virtual pentru analiza opțiunilor de navigare")
 
 container_chat = st.container()
@@ -59,37 +76,34 @@ intrebare_user = st.chat_input("Adresează orice întrebare sau comandă asisten
 if intrebare_user:
     st.session_state.mesaje_chat.append({"role": "user", "text": intrebare_user})
     
-    context_sistem = f"Ești asistentul unui robot mobil cu un singur senzor ultrasonic pe ax rotativ. " \
-                     f"Status actual: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
-                     f"Distanțe - Față: {fata_text}, Stânga: {stanga_text}, Dreapta: {dreapta_text}. " \
-                     f"Rute sigure: {rute_valabile}. Răspunde scurt, direct, în limba română."
+    context_sistem = f"Context hardware actual: Robotul este dotat cu un SINGUR senzor ultrasonic montat pe un ax rotativ. " \
+                     f"Status: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
+                     f"Direcție Față: {fata_text}, Direcție Stânga: {stanga_text}, Direcție Dreapta: {dreapta_text}. " \
+                     f"Rute sigure determinate: {rute_valabile}. Răspunde scurt, ingineresc, în limba română. Dacă utilizatorul întreabă altceva din afara proiectului, răspunde-i liber la orice."
 
     try:
-        # Folosim modelul Qwen2.5-Coder complet liber de restricții
-        API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-1.5B-Instruct"
-        headers = {"Authorization": "Bearer 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"}
+        # Cheia ta oficială nouă:
+        CHEIE_API = "AQ.Ab8RN6IPdIPT-rFR-Q__QVrUr27zNASAN8j20epG48ULDnu75A"
         
-        prompt_complet = f"<|im_start|>system\n{context_sistem}<|im_end|>\n<|im_start|>user\n{intrebare_user}<|im_end|>\n<|im_start|>assistant\n"
+        url_api = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={CHEIE_API}"
         
-        payload = {
-            "inputs": prompt_complet,
-            "parameters": {"max_new_tokens": 150, "temperature": 0.5}
+        payload_ai = {
+            "contents": [{
+                "parts": [{"text": f"{context_sistem}\n\nUtilizator: {intrebare_user}"}]
+            }]
         }
         
-        raspuns_raw = requests.post(API_URL, headers=headers, json=payload, timeout=6)
-        
+        raspuns_raw = requests.post(url_api, json=payload_ai, timeout=5)
         if raspuns_raw.status_code == 200:
-            rezultat = raspuns_raw.json()
-            text_generat = rezultat[0]['generated_text']
-            text_raspuns = text_generat.split("<|im_start|>assistant\n")[-1].replace("<|im_end|>", "").strip()
+            text_raspuns = raspuns_raw.json()['candidates'][0]['content']['parts'][0]['text']
         else:
-            text_raspuns = "🤖 Serverul AI se sincronizează. Te rog retrimite mesajul."
+            text_raspuns = "🤖 Serverul Gemini se activează cu noul cod. Trimite din nou mesajul peste 3 secunde."
     except:
-        text_raspuns = "🤖 Întâmpinăm o mică problemă la comunicarea cu modelul. Reîncearcă."
+        text_raspuns = "🤖 Conexiune realizată, dar s-a produs o reîmprospătare de pagină. Reîncearcă."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
 
-# Auto-refresh asincron la 0.5 secunde pentru fluiditate
+# Auto-refresh asincron la 0.5 secunde
 time.sleep(0.5)
 st.rerun()
