@@ -80,9 +80,9 @@ if intrebare_user:
         if raspuns_raw.status_code == 200:
             text_raspuns = raspuns_raw.json()['candidates'][0]['content']['parts'][0]['text']
         else:
-            text_raspuns = "🤖 Conexiunea la Google AI a eșuat. Verifică dacă cheia din Secrets este cea corectă."
+            text_raspuns = "🤖 Serverul Gemini a refuzat cererea. Verifică dacă cheia din setările Secrets Streamlit este salvată complet."
     except Exception as e:
-        text_raspuns = f"🤖 Eroare la citirea cheii din Secrets."
+        text_raspuns = "🤖 Nu s-a putut citi variabila GEMINI_KEY din Secrets. Verifică panoul Streamlit."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
