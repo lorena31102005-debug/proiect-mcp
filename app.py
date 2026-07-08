@@ -63,7 +63,7 @@ with col2:
 
 st.divider()
 
-# --- ASISTENT INTELEGENT GEMINI (DEBLOCAT ȘI ACTIV) ---
+# --- ASISTENT INTELEGENT GEMINI (SECURIZAT) ---
 st.header("💬 Asistent virtual pentru analiza opțiunilor de navigare")
 
 container_chat = st.container()
@@ -82,8 +82,8 @@ if intrebare_user:
                      f"Rute sigure determinate: {rute_valabile}. Răspunde scurt, ingineresc, în limba română. Dacă utilizatorul întreabă altceva din afara proiectului, răspunde-i liber la orice."
 
     try:
-        # Cheia ta oficială nouă:
-        CHEIE_API = "AQ.Ab8RN6IPdIPT-rFR-Q__QVrUr27zNASAN8j20epG48ULDnu75A"
+        # Preluare securizată din panoul Streamlit
+        CHEIE_API = st.secrets["GEMINI_KEY"]
         
         url_api = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={CHEIE_API}"
         
@@ -97,9 +97,9 @@ if intrebare_user:
         if raspuns_raw.status_code == 200:
             text_raspuns = raspuns_raw.json()['candidates'][0]['content']['parts'][0]['text']
         else:
-            text_raspuns = "🤖 Serverul Gemini se activează cu noul cod. Trimite din nou mesajul peste 3 secunde."
+            text_raspuns = "🤖 Cheia veche a fost blocată de GitHub. Te rog adaugă noua cheie în secțiunea 'Secrets' din dreapta jos a ecranului (Manage App)."
     except:
-        text_raspuns = "🤖 Conexiune realizată, dar s-a produs o reîmprospătare de pagină. Reîncearcă."
+        text_raspuns = "🤖 Vă rugăm să configurați variabila GEMINI_KEY în panoul de control Streamlit."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
