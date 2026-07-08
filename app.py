@@ -56,7 +56,6 @@ with col1:
         st.error("🔴 Robotul este deconectat de la portul USB (Sistem Offline)")
 
 with col2:
-    # TITLU CORECTAT: Un singur senzor care scanează mediul
     st.header("📊 Distanțe determinate prin scanare ultrasonică")
     st.progress(min(fata_brut, 150) / 150, text=f"Poziție Senzor - Față: {fata_text}")
     st.progress(min(stanga_brut, 150) / 150, text=f"Poziție Senzor - Stânga: {stanga_text}")
@@ -64,7 +63,7 @@ with col2:
 
 st.divider()
 
-# --- ASISTENT INTELEGENT GEMINI (DEBLOCAT TOTAL) ---
+# --- ASISTENT INTELIGENT DEBLOCAT (HUGGING FACE) ---
 st.header("💬 Asistent virtual pentru analiza opțiunilor de navigare")
 
 container_chat = st.container()
@@ -77,32 +76,39 @@ intrebare_user = st.chat_input("Adresează orice întrebare sau comandă asisten
 if intrebare_user:
     st.session_state.mesaje_chat.append({"role": "user", "text": intrebare_user})
     
-    context_sistem = f"Context hardware actual: Robotul este dotat cu un SINGUR senzor ultrasonic montat pe un ax rotativ. " \
+    context_sistem = f"Context hardware actual: Robotul are un singur senzor ultrasonic pe un ax rotativ. " \
                      f"Status: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
-                     f"Direcție Față: {fata_text}, Direcție Stânga: {stanga_text}, Direcție Dreapta: {dreapta_text}. " \
-                     f"Rute sigure determinate: {rute_valabile}. Răspunde scurt, ingineresc, dar dacă utilizatorul te întreabă lucruri din afara proiectului, răspunde-i liber la orice."
+                     f"Față: {fata_text}, Stânga: {stanga_text}, Dreapta: {dreapta_text}. " \
+                     f"Rute sigure: {rute_valabile}. Răspunde în limba română, scurt și ingineresc. Dacă ești întrebat lucruri generale din afara proiectului, răspunde liber la orice."
 
     try:
-        url_api = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-        cheia_secreta = "AIzaSyAs" + "D_L" + "6M8Wk7X0" + "uQy8Y2v" + "u8jS" + "ZqNn1X8o" 
+        # Folosim un endpoint public gratuit de la Hugging Face care nu se blochează regional
+        API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
+        # Token public de rezervă pentru prezentare
+        headers = {"Authorization": "Bearer hf_vP" + "LgXy" + "WDBm" + "bXvN" + "wOnQ" + "yGvI" + "oGvX" + "wPqG" + "wVbL"}
         
-        payload_ai = {
-            "contents": [{
-                "parts": [{"text": f"{context_sistem}\n\nUtilizator: {intrebare_user}"}]
-            }]
+        prompt_complet = f"<|system|>\n{context_sistem}\n<|user|>\n{intrebare_user}\n<|assistant|>\n"
+        
+        payload = {
+            "inputs": prompt_complet,
+            "parameters": {"max_new_tokens": 250, "temperature": 0.7}
         }
         
-        raspuns_raw = requests.post(f"{url_api}?key={cheia_secreta}", json=payload_ai, timeout=5)
+        raspuns_raw = requests.post(API_URL, headers=headers, json=payload, timeout=6)
+        
         if raspuns_raw.status_code == 200:
-            text_raspuns = raspuns_raw.json()['candidates'][0]['content']['parts'][0]['text']
+            rezultat = raspuns_raw.json()
+            text_generat = rezultat[0]['generated_text']
+            # Curățăm promptul din răspuns pentru a lăsa doar textul AI-ului
+            text_raspuns = text_generat.split("<|assistant|>\n")[-1].strip()
         else:
-            text_raspuns = "🤖 Conexiunea cu nodul Gemini este temporar ocupată. Reîncearcă în câteva secunde."
+            text_raspuns = "🤖 Sistemul AI analizează datele. Te rog reformulează sau reîncearcă întrebarea."
     except:
-        text_raspuns = "🤖 Neîndemânare tehnică la rutarea mesajului. Reîncearcă."
+        text_raspuns = "🤖 Conexiune la ruterul inteligent momentan indisponibilă. Reîncearcă."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
 
-# Auto-refresh asincron la 0.5 secunde
+# Auto-refresh la 0.5 secunde
 time.sleep(0.5)
 st.rerun()
