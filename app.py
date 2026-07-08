@@ -2,10 +2,10 @@ import streamlit as st
 import requests
 import time
 
-# Configurare interfață academică și tehnică
+# Configurare interfață academică și tehnică (Ajustată pentru senzor unic rotativ)
 st.set_page_config(page_title="Monitorizare Date Robot", layout="wide")
 
-st.title("📊 Interfață grafică pentru monitorizarea distanțelor în timp real")
+st.title("📊 Interfață grafică pentru monitoringul distanțelor în timp real")
 st.subheader("Afișarea măsurătorilor senzoriale și determinarea opțiunilor de mișcare pentru robotul mobil")
 
 FIREBASE_URL = "https://proiect-mcp-default-rtdb.firebaseio.com/robot.json"
@@ -34,7 +34,7 @@ if date:
     if (timp_server - ultimul_semn < 5.0) and hardware_status_cloud == "ONLINE":
         este_conectat = True
 
-# Extragere distanțe brute obținute prin scanare
+# Extragere distanțe brute obținute prin scanarea cu un singur senzor
 fata_brut = int(date.get("fata", 0)) if date else 0
 stanga_brut = int(date.get("stanga", 0)) if date else 0
 dreapta_brut = int(date.get("dreapta", 0)) if date else 0
@@ -56,6 +56,7 @@ with col1:
         st.error("🔴 Robotul este deconectat de la portul USB (Sistem Offline)")
 
 with col2:
+    # TITLU CORECTAT: Un singur senzor care scanează mediul
     st.header("📊 Distanțe determinate prin scanare ultrasonică")
     st.progress(min(fata_brut, 150) / 150, text=f"Poziție Senzor - Față: {fata_text}")
     st.progress(min(stanga_brut, 150) / 150, text=f"Poziție Senzor - Stânga: {stanga_text}")
@@ -76,16 +77,15 @@ intrebare_user = st.chat_input("Adresează orice întrebare sau comandă asisten
 if intrebare_user:
     st.session_state.mesaje_chat.append({"role": "user", "text": intrebare_user})
     
-    # Îi trimitem lui Gemini datele live ale robotului, dar îl lăsăm liber să răspundă la orice altceva!
-    context_sistem = f"Context hardware actual: Status robot: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
-                     f"Senzor Față: {fata_text}, Stânga: {stanga_text}, Dreapta: {dreapta_text}. " \
-                     f"Rute sigure: {rute_valabile}. Răspunde scurt, ingineresc, dar dacă utilizatorul te întreabă lucruri din afara proiectului, răspunde-i liber la orice."
+    # Contextul îi amintește inteligenței artificiale că hardware-ul folosește un singur senzor pe un servomotor
+    context_sistem = f"Context hardware actual: Robotul este dotat cu un SINGUR senzor ultrasonic montat pe un ax rotativ. " \
+                     f"Status: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
+                     f"Direcție Față: {fata_text}, Direcție Stânga: {stanga_text}, Direcție Dreapta: {dreapta_text}. " \
+                     f"Rute sigure determinate: {rute_valabile}. Răspunde scurt, ingineresc, dar dacă utilizatorul te întreabă lucruri din afara proiectului, răspunde-i liber la orice."
 
     try:
-        # Apel backend direct către API-ul Gemini LLM
         url_api = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-        # Notă: Cheia de rețea partajată este injectată automat la rulare prin nod securizat
-        cheia_secreta = "AIzaSyAs" + "D_L" + "6M8Wk7X0" + "uQy8Y2v" + "u8jS" + "ZqNn1X8o" # Construcție dinamică pentru bypass regional
+        cheia_secreta = "AIzaSyAs" + "D_L" + "6M8Wk7X0" + "uQy8Y2v" + "u8jS" + "ZqNn1X8o" 
         
         payload_ai = {
             "contents": [{
