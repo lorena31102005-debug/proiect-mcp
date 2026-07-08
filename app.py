@@ -5,11 +5,14 @@ import time
 # Configurare interfață academică, tehnică și estetică modernă
 st.set_page_config(page_title="Monitorizare Date Robot", layout="wide", initial_sidebar_state="collapsed")
 
-# Injectare stil custom CSS pentru un aspect premium (carduri rotunjite, umbre ușoare)
+# Injectare stil custom CSS corectat (forțăm culorile textului pentru lizibilitate maximă)
 st.markdown("""
     <style>
     .stApp {
         background-color: #f8f9fa;
+    }
+    h1, h2, h3, h4, h5, h6, p, span, label {
+        color: #1e293b !important; /* Forțează un gri foarte închis, aproape negru academic */
     }
     .custom-card {
         background-color: #ffffff;
@@ -24,6 +27,10 @@ st.markdown("""
         border-radius: 12px;
         padding: 20px;
         border: 1px solid #e9ecef;
+    }
+    /* Asigurăm vizibilitatea textului în progress bars */
+    .stProgress > div > div > div > div {
+        color: #ffffff !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -70,7 +77,7 @@ fata_text = "Zonă liberă" if fata_brut == 150 else f"{fata_brut} cm"
 stanga_text = "Zonă liberă" if stanga_brut == 150 else f"{stanga_brut} cm"
 dreapta_text = "Zonă liberă" if dreapta_brut == 150 else f"{dreapta_brut} cm"
 
-# --- INTERFAȚĂ GRAFICĂ REORGANIZATĂ PE COLOANE ȘI CARDURI VIZUALE ---
+# --- INTERFAȚĂ GRAFICĂ REORGANIZATĂ PENTRU COLOANE ȘI CARDURI VIZUALE ---
 col1, col2 = st.columns(2, gap="large")
 
 with col1:
@@ -88,7 +95,6 @@ with col2:
     st.markdown('<div class="custom-card">', unsafe_allow_html=True)
     st.header("📊 Distanțe determinate prin scanare ultrasonică")
     
-    # Afișaj curat cu bare de progres elegante și distanțe evidențiate vizual
     st.markdown(f"**Poziție Senzor - Față:** `{fata_text}`")
     st.progress(min(fata_brut, 150) / 150)
     
@@ -101,7 +107,7 @@ with col2:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- ASISTENT INTELEGENT GEMINI (ZONĂ DE CHAT REORGANIZATĂ) ---
+# --- ASISTENT INTELEGENT GEMINI ---
 st.header("💬 Asistent virtual pentru analiza opțiunilor de navigare")
 
 st.markdown('<div class="chat-box">', unsafe_allow_html=True)
