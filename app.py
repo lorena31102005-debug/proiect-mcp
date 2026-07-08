@@ -63,7 +63,7 @@ with col2:
 
 st.divider()
 
-# --- ASISTENT INTELIGENT DEBLOCAT (HUGGING FACE CU CHEIE PROPRIE) ---
+# --- ASISTENT INTELIGENT DEBLOCAT ---
 st.header("💬 Asistent virtual pentru analiza opțiunilor de navigare")
 
 container_chat = st.container()
@@ -76,20 +76,21 @@ intrebare_user = st.chat_input("Adresează orice întrebare sau comandă asisten
 if intrebare_user:
     st.session_state.mesaje_chat.append({"role": "user", "text": intrebare_user})
     
-    context_sistem = f"Context hardware actual: Robotul are un singur senzor ultrasonic pe un ax rotativ. " \
-                     f"Status: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
-                     f"Față: {fata_text}, Stânga: {stanga_text}, Dreapta: {dreapta_text}. " \
-                     f"Rute sigure: {rute_valabile}. Răspunde în limba română, scurt și ingineresc. Dacă ești întrebat lucruri generale din afara proiectului, răspunde liber la orice."
+    context_sistem = f"Ești asistentul unui robot mobil cu un singur senzor ultrasonic pe ax rotativ. " \
+                     f"Status actual: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
+                     f"Distanțe - Față: {fata_text}, Stânga: {stanga_text}, Dreapta: {dreapta_text}. " \
+                     f"Rute sigure: {rute_valabile}. Răspunde scurt, direct, în limba română."
 
     try:
-        API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
+        # Folosim modelul Qwen2.5-Coder complet liber de restricții
+        API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-1.5B-Instruct"
         headers = {"Authorization": "Bearer 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"}
         
-        prompt_complet = f"<|system|>\n{context_sistem}\n<|user|>\n{intrebare_user}\n<|assistant|>\n"
+        prompt_complet = f"<|im_start|>system\n{context_sistem}<|im_end|>\n<|im_start|>user\n{intrebare_user}<|im_end|>\n<|im_start|>assistant\n"
         
         payload = {
             "inputs": prompt_complet,
-            "parameters": {"max_new_tokens": 250, "temperature": 0.7}
+            "parameters": {"max_new_tokens": 150, "temperature": 0.5}
         }
         
         raspuns_raw = requests.post(API_URL, headers=headers, json=payload, timeout=6)
@@ -97,15 +98,15 @@ if intrebare_user:
         if raspuns_raw.status_code == 200:
             rezultat = raspuns_raw.json()
             text_generat = rezultat[0]['generated_text']
-            text_raspuns = text_generat.split("<|assistant|>\n")[-1].strip()
+            text_raspuns = text_generat.split("<|im_start|>assistant\n")[-1].replace("<|im_end|>", "").strip()
         else:
-            text_raspuns = "🤖 Serverul AI se inițializează cu noua ta cheie. Te rog retrimite mesajul în câteva secunde."
+            text_raspuns = "🤖 Serverul AI se sincronizează. Te rog retrimite mesajul."
     except:
-        text_raspuns = "🤖 Întâmpinăm o mică problemă la trimiterea mesajului. Reîncearcă."
+        text_raspuns = "🤖 Întâmpinăm o mică problemă la comunicarea cu modelul. Reîncearcă."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
 
-# Auto-refresh la 0.5 secunde
+# Auto-refresh asincron la 0.5 secunde pentru fluiditate
 time.sleep(0.5)
 st.rerun()
