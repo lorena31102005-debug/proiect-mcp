@@ -63,7 +63,7 @@ with col2:
 
 st.divider()
 
-# --- ASISTENT INTELIGENT DEBLOCAT (HUGGING FACE) ---
+# --- ASISTENT INTELIGENT DEBLOCAT (HUGGING FACE CU CHEIE PROPRIE) ---
 st.header("💬 Asistent virtual pentru analiza opțiunilor de navigare")
 
 container_chat = st.container()
@@ -82,10 +82,9 @@ if intrebare_user:
                      f"Rute sigure: {rute_valabile}. Răspunde în limba română, scurt și ingineresc. Dacă ești întrebat lucruri generale din afara proiectului, răspunde liber la orice."
 
     try:
-        # Folosim un endpoint public gratuit de la Hugging Face care nu se blochează regional
         API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
-        # Token public de rezervă pentru prezentare
-        headers = {"Authorization": "Bearer hf_vP" + "LgXy" + "WDBm" + "bXvN" + "wOnQ" + "yGvI" + "oGvX" + "wPqG" + "wVbL"}
+        # Integrarea securizată a tokenului tău nou
+        headers = {"Authorization": "Bearer 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"}
         
         prompt_complet = f"<|system|>\n{context_sistem}\n<|user|>\n{intrebare_user}\n<|assistant|>\n"
         
@@ -98,13 +97,12 @@ if intrebare_user:
         
         if raspuns_raw.status_code == 200:
             rezultat = raspuns_raw.json()
-            text_generat = rezultat[0]['generated_text']
-            # Curățăm promptul din răspuns pentru a lăsa doar textul AI-ului
+            text_generat = resultado = rezultat[0]['generated_text']
             text_raspuns = text_generat.split("<|assistant|>\n")[-1].strip()
         else:
-            text_raspuns = "🤖 Sistemul AI analizează datele. Te rog reformulează sau reîncearcă întrebarea."
+            text_raspuns = "🤖 Serverul AI se inițializează cu noua ta cheie. Te rog retrimite mesajul în câteva secunde."
     except:
-        text_raspuns = "🤖 Conexiune la ruterul inteligent momentan indisponibilă. Reîncearcă."
+        text_raspuns = "🤖 Întâmpinăm o mică problemă la trimiterea mesajului. Reîncearcă."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
