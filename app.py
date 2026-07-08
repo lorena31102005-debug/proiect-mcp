@@ -26,7 +26,7 @@ st.markdown("""
         border: 1px solid #e9ecef;
     }
     </style>
-""", unsafe_unsafe_with_html=True)
+""", unsafe_allow_html=True)
 
 # --- TITLURI ȘI SUBTITLURI (PĂSTRATE EXACT) ---
 st.title("📊 Interfață grafică pentru monitorizarea distanțelor în timp real")
