@@ -74,10 +74,9 @@ if intrebare_user:
     try:
         CHEIE_API = st.secrets["GEMINI_KEY"]
         
-        # URL Curat fără cheie la vedere în link
+        # URL corectat complet conform noilor cerințe v1beta
         url_api = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
         
-        # Transmitem cheia prin antetul HTTP (Metoda oficială securizată pentru noul format)
         antete = {
             "Content-Type": "application/json",
             "x-goog-api-key": CHEIE_API
@@ -89,9 +88,9 @@ if intrebare_user:
         if raspuns_raw.status_code == 200:
             text_raspuns = raspuns_raw.json()['candidates'][0]['content']['parts'][0]['text']
         else:
-            text_raspuns = f"🤖 Serverul Google a răspuns cu codul {raspuns_raw.status_code}. Formatul cheii din Secrets este bun, dar verifică dacă nu conține spații suplimentare."
+            text_raspuns = f"🤖 Serverul Google a răspuns cu codul {raspuns_raw.status_code}. Te rog verifică cheia din Secrets."
     except Exception as e:
-        text_raspuns = "🤖 Nu s-a putut citi variabila GEMINI_KEY din Secrets. Verifică panoul Streamlit."
+        text_raspuns = "🤖 Nu s-a putut citi variabila GEMINI_KEY din Secrets."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
