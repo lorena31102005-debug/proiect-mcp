@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import time
+import difflib
 
 st.set_page_config(page_title="Monitorizare Date Robot", layout="wide")
 
@@ -69,31 +70,44 @@ with container_chat:
 intrebare_user = st.chat_input("Adresează orice întrebare sau comandă asistentului AI...")
 if intrebare_user:
     st.session_state.mesaje_chat.append({"role": "user", "text": intrebare_user})
-    context_sistem = f"Sistem: Ești asistentul unui robot mobil. Date curente - Senzor Față: {fata_text}, Senzor Stânga: {stanga_text}, Senzor Dreapta: {dreapta_text}. Status robot: {'ONLINE' if este_conectat else 'OFFLINE'}. Rute valabile: {rute_valabile}. Răspunde scurt, prietenos și strict în limba română la întrebare."
     
-    try:
-        # Cheia ta reconstruită în cod pentru a evita erorile Streamlit Secrets și filtrele GitHub
-        p1 = "hf_"
-        p2 = "zkoFBTDNmXqdKuPsdHnsuamagRBMvTfJXn"
-        TOKEN_HF = p1 + p2
+    # Intențiile utilizatorului procesate prin NLP local
+    intrebare_curata = intrebare_user.lower().strip()
+    
+    # Matrice de răspunsuri dinamice bazate pe starea curentă a senzorilor
+    if any(cuvant in intrebare_curata for cuvant in ["salut", "buna", "hei", "hello"]):
+        text_raspuns = "🤖 Salut! Sunt asistentul tău de navigare. Cu ce te pot ajuta astăzi în monitorizarea robotului?"
         
-        url_api = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct"
-        antete = {"Authorization": f"Bearer {TOKEN_HF}"}
-        payload = {
-            "inputs": f"<|system|>\n{context_sistem}\n<|user|>\n{intrebare_user}\n<|assistant|>\n",
-            "parameters": {"max_new_tokens": 150, "temperature": 0.7}
-        }
-        
-        raspuns_raw = requests.post(url_api, json=payload, headers=antete, timeout=10)
-        
-        if raspuns_raw.status_code == 200:
-            rezultat = raspuns_raw.json()
-            text_complet = rezultat[0]['generated_text']
-            text_raspuns = text_complet.split("<|assistant|>\n")[-1].strip()
+    elif any(cuvant in intrebare_curata for cuvant in ["fata", "față", "obstacol", "obiect"]):
+        text_raspuns = f"🤖 Analiza senzorului frontal: În față avem o distanță de {fata_text}. "
+        if fata_brut < 40:
+            text_raspuns += "Atenție, spațiul este critic! Robotul trebuie să oprească sau să vireze."
         else:
-            text_raspuns = f"🤖 Serverul AI a răspuns cu codul {raspuns_raw.status_code}. Mesaj: {raspuns_raw.text[:100]}"
-    except Exception as e:
-        text_raspuns = f"🤖 Problemă la procesarea mesajului: {str(e)}"
+            text_raspuns += "Drumul înainte este relativ sigur."
+            
+    elif any(cuvant in intrebare_curata for cuvant in ["stanga", "stânga", "dreapta"]):
+        text_raspuns = f"🤖 Analiza laterală în timp real: În stânga senzorul indică {stanga_text}, iar în dreapta avem {dreapta_text}."
+        
+    elif any(cuvant in intrebare_curata for cuvant in ["status", "conectat", "online", "functional", "stare"]):
+        if este_conectat:
+            text_raspuns = f"🤖 Sistemul este ONLINE. Conexiunea cu Firebase este stabilă, iar rutele recomandate acum sunt: {rute_valabile}."
+        else:
+            text_raspuns = "🤖 În prezent sistemul hardware este OFFLINE. Verifică conexiunea cablului USB la robot."
+            
+    elif any(cuvant in intrebare_curata for cuvant in ["incotro", "încotro", "unde", "ruta", "navig", "deplas", "miscare", "mișcare"]):
+        if not este_conectat:
+            text_raspuns = "🤖 Robotul fiind offline, nu pot calcula rute sigure în acest moment."
+        else:
+            text_raspuns = f"🤖 Pe baza analizei spațiale, senzorii recomandă direcțiile: **{rute_valabile}**. "
+            if "Nicio" in rute_valabile:
+                text_raspuns += "Suntem blocați complet, recomand retragerea cu spatele!"
+            elif len(rute_valabile.split(",")) > 1:
+                text_raspuns += "Ai opțiuni multiple libere, poți continua deplasarea cu încredere."
+            else:
+                text_raspuns += f"Urmează strict calea către {rute_valabile}."
+    else:
+        # Răspuns inteligent implicit (Fallback) care combină toate datele dinamice
+        text_raspuns = f"🤖 Am analizat solicitarea ta. Date curente: Față ({fata_text}), Stânga ({stanga_text}), Dreapta ({dreapta_text}). Status: {'ONLINE' if este_conectat else 'OFFLINE'}. Direcții optime: {rute_valabile}."
 
     st.session_state.mesaje_chat.append({"role": "assistant", "text": text_raspuns})
     st.rerun()
