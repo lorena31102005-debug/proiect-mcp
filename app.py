@@ -83,7 +83,6 @@ if intrebare_user:
 
     try:
         API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
-        # Integrarea securizată a tokenului tău nou
         headers = {"Authorization": "Bearer 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"}
         
         prompt_complet = f"<|system|>\n{context_sistem}\n<|user|>\n{intrebare_user}\n<|assistant|>\n"
@@ -97,7 +96,7 @@ if intrebare_user:
         
         if raspuns_raw.status_code == 200:
             rezultat = raspuns_raw.json()
-            text_generat = resultado = rezultat[0]['generated_text']
+            text_generat = rezultat[0]['generated_text']
             text_raspuns = text_generat.split("<|assistant|>\n")[-1].strip()
         else:
             text_raspuns = "🤖 Serverul AI se inițializează cu noua ta cheie. Te rog retrimite mesajul în câteva secunde."
