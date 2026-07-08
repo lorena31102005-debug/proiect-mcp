@@ -1,21 +1,4 @@
-import streamlit as st
-import requests
-import time
 
-# Configurare interfață academică și tehnică (Ajustată pentru senzor unic rotativ)
-st.set_page_config(page_title="Monitorizare Date Robot", layout="wide")
-
-st.title("📊 Interfață grafică pentru monitorizarea distanțelor în timp real")
-st.subheader("Afișarea măsurătorilor senzoriale și determinarea opțiunilor de mișcare pentru robotul mobil")
-
-FIREBASE_URL = "https://proiect-mcp-default-rtdb.firebaseio.com/robot.json"
-
-if "mesaje_chat" not in st.session_state: 
-    st.session_state.mesaje_chat = []
-
-def preia_date_cloud():
-    try:
-        raspuns = requests.get(FIREBASE_URL, timeout=0.3)
         if raspuns.status_code == 200:
             return raspuns.json()
     except:
