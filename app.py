@@ -74,21 +74,16 @@ if intrebare_user:
     try:
         CHEIE_API = st.secrets["GEMINI_KEY"]
         
-        url_api = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={CHEIE_API}"
+        # URL actualizat cu denumirea oficială completă a modelului stabil (gemini-1.5-flash-latest)
+        url_api = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={CHEIE_API}"
+        
         payload_ai = {"contents": [{"parts": [{"text": f"{context_sistem}\n\nUtilizator: {intrebare_user}"}]}]}
         
         raspuns_raw = requests.post(url_api, json=payload_ai, timeout=5)
-        
         if raspuns_raw.status_code == 200:
             text_raspuns = raspuns_raw.json()['candidates'][0]['content']['parts'][0]['text']
         else:
-            url_fallback = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={CHEIE_API}"
-            raspuns_fallback = requests.post(url_fallback, json=payload_ai, timeout=5)
-            
-            if raspuns_fallback.status_code == 200:
-                text_raspuns = raspuns_fallback.json()['candidates'][0]['content']['parts'][0]['text']
-            else:
-                text_raspuns = f"🤖 Serverul Google a refuzat cererea (Cod {raspuns_raw.status_code} / Fallback {raspuns_fallback.status_code}). Te rog verifică dacă noua cheie a fost salvată în Secrets."
+            text_raspuns = f"🤖 Serverul Google a returnat codul {raspuns_raw.status_code}. Detalii: {raspuns_raw.text[:100]}"
     except Exception as e:
         text_raspuns = "🤖 Nu s-a putut citi variabila GEMINI_KEY din Secrets."
 
