@@ -5,7 +5,7 @@ import time
 # Configurare interfață academică și tehnică (Ajustată pentru senzor unic rotativ)
 st.set_page_config(page_title="Monitorizare Date Robot", layout="wide")
 
-st.title("📊 Interfață grafică pentru monitoringul distanțelor în timp real")
+st.title("📊 Interfață grafică pentru monitorizarea distanțelor în timp real")
 st.subheader("Afișarea măsurătorilor senzoriale și determinarea opțiunilor de mișcare pentru robotul mobil")
 
 FIREBASE_URL = "https://proiect-mcp-default-rtdb.firebaseio.com/robot.json"
@@ -77,7 +77,6 @@ intrebare_user = st.chat_input("Adresează orice întrebare sau comandă asisten
 if intrebare_user:
     st.session_state.mesaje_chat.append({"role": "user", "text": intrebare_user})
     
-    # Contextul îi amintește inteligenței artificiale că hardware-ul folosește un singur senzor pe un servomotor
     context_sistem = f"Context hardware actual: Robotul este dotat cu un SINGUR senzor ultrasonic montat pe un ax rotativ. " \
                      f"Status: {'ONLINE' if este_conectat else 'OFFLINE'}. " \
                      f"Direcție Față: {fata_text}, Direcție Stânga: {stanga_text}, Direcție Dreapta: {dreapta_text}. " \
