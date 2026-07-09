@@ -3,4 +3,4 @@ Acest proiect reprezintă integrarea hardware și software a unui sistem demonst
 destinat monitorizării distanțelor și asistenței la navigare în timp real.
 ## 📺 Prezentare Video
 Aici puteți viziona clipul de prezentare a proiectului:
-▶️ [**Link Prezentare Proiect pe YouTube**]("https://youtu.be/Y8qLoUro6BQ")
+▶️ [**Link Prezentare Proiect pe YouTube**] https://youtu.be/Y8qLoUro6BQ
